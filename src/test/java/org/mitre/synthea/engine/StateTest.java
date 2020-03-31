@@ -1749,7 +1749,7 @@ public class StateTest {
     assertTrue(supplyListState.process(person, time));
     
     Encounter encounter = person.getCurrentEncounter(module);
-    List<HealthRecord.Supply> supplies = encounter.supplies;
+    List<JsonObject> supplies = encounter.supplies;
     assertNotNull(supplies);
     assertEquals(4, supplies.size());
     
@@ -1760,10 +1760,11 @@ public class StateTest {
     int[] expectedQuantities = { 10_000, 3_000, 98765, 1 };
     
     for (int i = 0; i < 4; i++) {
-      HealthRecord.Supply supply = supplies.get(i);
-      assertEquals(expectedCodes[i], supply.code.code);
-      assertEquals(expectedDisplays[i], supply.code.display);
-      assertEquals(expectedQuantities[i], supply.quantity);
+      JsonObject supply = supplies.get(i);
+      JsonObject supplyCode = supply.get("code").getAsJsonObject();
+      assertEquals(expectedCodes[i], supplyCode.get("code").getAsString());
+      assertEquals(expectedDisplays[i], supplyCode.get("display").getAsString());
+      assertEquals(expectedQuantities[i], supply.get("quantity").getAsInt());
     }
   }
 }

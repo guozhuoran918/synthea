@@ -1728,7 +1728,7 @@ public abstract class State implements Cloneable, Serializable {
    */
   public static class SupplyList extends State {
     // TODO: make a class for these, when needed beyond just exporting
-    public List<HealthRecord.Supply> supplies;
+    public List<JsonObject> supplies;
 
     @Override
     public SupplyList clone() {

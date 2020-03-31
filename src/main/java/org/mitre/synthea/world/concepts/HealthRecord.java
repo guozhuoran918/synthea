@@ -430,11 +430,6 @@ public class HealthRecord implements Serializable {
       return retVal;
     }
   }
-  
-  public class Supply implements Serializable {
-    public int quantity;
-    public Code code;
-  }
 
   public enum EncounterType {
     WELLNESS("AMB"), AMBULATORY("AMB"), OUTPATIENT("AMB"),
@@ -486,7 +481,7 @@ public class HealthRecord implements Serializable {
     public List<CarePlan> careplans;
     public List<ImagingStudy> imagingStudies;
     public List<Device> devices;
-    public List<Supply> supplies;
+    public List<JsonObject> supplies;
     public Claim claim; // for now assume 1 claim per encounter
     public Code reason;
     public Code discharge;
@@ -521,7 +516,7 @@ public class HealthRecord implements Serializable {
       careplans = new ArrayList<CarePlan>();
       imagingStudies = new ArrayList<ImagingStudy>();
       devices = new ArrayList<Device>();
-      supplies = new ArrayList<Supply>();
+      supplies = new ArrayList<JsonObject>();
       this.claim = new Claim(this, person);
     }
 
