@@ -475,6 +475,22 @@ public class HealthRecord implements Serializable {
     }
   }
 
+  public class Symptom extends Entry {
+
+    public String symptomName;
+
+    public Code symptomCode;
+
+    public Symptom(
+            long time,
+            String symptomName,
+            Code symptomCode) {
+      super(time, symptomCode.code);
+      this.symptomCode = symptomCode;
+      this.symptomName = symptomName;
+    }
+  }
+
   public class Encounter extends Entry {
     public List<Observation> observations;
     public List<Report> reports;
@@ -487,6 +503,7 @@ public class HealthRecord implements Serializable {
     public List<ImagingStudy> imagingStudies;
     public List<Device> devices;
     public List<Supply> supplies;
+    public List<Symptom> symptoms;
     public Claim claim; // for now assume 1 claim per encounter
     public Code reason;
     public Code discharge;
@@ -522,6 +539,7 @@ public class HealthRecord implements Serializable {
       imagingStudies = new ArrayList<ImagingStudy>();
       devices = new ArrayList<Device>();
       supplies = new ArrayList<Supply>();
+      symptoms = new ArrayList<Symptom>();
       this.claim = new Claim(this, person);
     }
 
@@ -703,6 +721,14 @@ public class HealthRecord implements Serializable {
       present.get(primaryCode).stop = time;
       present.remove(primaryCode);
     }
+  }
+
+  public Symptom recordSymptom(long time, Code symptomCode, String symptomName) {
+    Symptom symptom = new Symptom(time, symptomName, symptomCode);
+    Encounter encounter = currentEncounter(time);
+    encounter.symptoms.add(symptom);
+
+    return  symptom;
   }
 
   public void conditionEndByState(long time, String stateName) {

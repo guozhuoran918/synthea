@@ -475,7 +475,7 @@ public class Generator {
     while (person.alive(time) && time < stop) {
 
       healthInsuranceModule.process(person, time + timestep);
-      encounterModule.process(person, time);
+      // encounterModule.process(person, time);
 
       Iterator<Module> iter = person.currentModules.iterator();
       while (iter.hasNext()) {
@@ -486,7 +486,7 @@ public class Generator {
           iter.remove(); // this module has completed/terminated.
         }
       }
-      encounterModule.endWellnessEncounter(person, time);
+      // encounterModule.endWellnessEncounter(person, time);
       person.lastUpdated = time;
       HealthRecordEditors.getInstance().executeAll(
               person, person.record, time, timestep, person.random);

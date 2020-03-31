@@ -1649,6 +1649,9 @@ public abstract class State implements Cloneable, Serializable {
     private Range<Integer> range;
     private Exact<Integer> exact;
     public boolean addressed;
+    public Code symptomCode;
+    public Code valueCode;
+    public List<Code> conditionCodes;
 
     @Override
     protected void initialize(Module module, String name, JsonObject definition) {
@@ -1671,6 +1674,9 @@ public abstract class State implements Cloneable, Serializable {
       clone.range = range;
       clone.exact = exact;
       clone.addressed = addressed;
+      clone.symptomCode = symptomCode;
+      clone.valueCode = valueCode;
+      clone.conditionCodes = conditionCodes;
       return clone;
     }
 
@@ -1685,7 +1691,23 @@ public abstract class State implements Cloneable, Serializable {
           person.setSymptom(cause, symptom, 0, addressed);
         }
       }
+
+      // only record if we have symcat-like-symptoms
+      if (symptomCode == null || valueCode == null || conditionCodes == null) {
+        return true;
+      }
+
+      if (exact != null && exact.quantity.equals(0)) {
+        return true;
+      }
+
+      person.record.recordSymptom(time, symptomCode, symptom);
+
       return true;
+    }
+
+    public String getSymptom() {
+      return symptom;
     }
   }
   

@@ -10,7 +10,7 @@ bin/**
 /.gradle/
 /bin/
 
-/output/
+/output*
 
 # don't commit the autobuilt version file
 src/main/resources/version.txt
@@ -23,3 +23,11 @@ src/main/resources/version.txt
 .vscode/launch.test.json
 .vscode/launch.json
 .vscode/settings.json
+
+# IDEA
+local.properties
+.idea/
+*.iml
+
+# Default name for local_modules_dir
+local_modules/

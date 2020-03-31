@@ -40,6 +40,7 @@ import org.mitre.synthea.world.concepts.HealthRecord.Medication;
 import org.mitre.synthea.world.concepts.HealthRecord.Observation;
 import org.mitre.synthea.world.concepts.HealthRecord.Procedure;
 import org.mitre.synthea.world.concepts.HealthRecord.Supply;
+import org.mitre.synthea.world.concepts.HealthRecord.Symptom;
 
 
 /**
@@ -101,7 +102,12 @@ public class CSVExporter {
    * Writer for supplies.csv
    */
   private OutputStreamWriter supplies;
-  
+
+  /**
+   * Writer for symptoms.csv
+   */
+  private OutputStreamWriter symptoms;
+
   /**
    * Writer for organizations.csv
    */
@@ -164,6 +170,7 @@ public class CSVExporter {
       File imagingStudiesFile = outputDirectory.resolve("imaging_studies.csv").toFile();
       File devicesFile = outputDirectory.resolve("devices.csv").toFile();
       File suppliesFile = outputDirectory.resolve("supplies.csv").toFile();
+      File symptomsFile = outputDirectory.resolve("symptoms.csv").toFile();
 
       patients = new OutputStreamWriter(new FileOutputStream(patientsFile, append), charset);
       allergies = new OutputStreamWriter(new FileOutputStream(allergiesFile, append), charset);
@@ -180,6 +187,7 @@ public class CSVExporter {
           new FileOutputStream(imagingStudiesFile, append), charset);
       devices = new OutputStreamWriter(new FileOutputStream(devicesFile, append), charset);
       supplies = new OutputStreamWriter(new FileOutputStream(suppliesFile, append), charset);
+      symptoms = new OutputStreamWriter(new FileOutputStream(symptomsFile, append), charset);
 
 
       File organizationsFile = outputDirectory.resolve("organizations.csv").toFile();
@@ -256,6 +264,8 @@ public class CSVExporter {
     payers.write(NEWLINE);
     payerTransitions.write("PATIENT,START_YEAR,END_YEAR,PAYER,OWNERSHIP");
     payerTransitions.write(NEWLINE);
+    symptoms.write("SYMPTOM_CODE,SYMPTOM_DISPLAY,ENCOUNTER,PATIENT");
+    symptoms.write(NEWLINE);
   }
 
   /**
@@ -413,6 +423,10 @@ public class CSVExporter {
       for (Supply supply : encounter.supplies) {
         supply(personID, encounterID, encounter, supply);
       }
+
+      for (Symptom symptom: encounter.symptoms) {
+        symptom(personID, encounterID, symptom);
+      }
     }
     CSVExporter.getInstance().exportPayerTransitions(person, time);
 
@@ -462,6 +476,7 @@ public class CSVExporter {
     imagingStudies.flush();
     devices.flush();
     supplies.flush();
+    symptoms.flush();
   }
 
   /**
@@ -635,6 +650,18 @@ public class CSVExporter {
 
     s.append(NEWLINE);
     write(s.toString(), conditions);
+  }
+
+  private void symptom(String personID, String encounterID, Symptom symptom) throws IOException {
+    // "SYMTPOM_CODE,SYMPTOM_DISPLAY,ENCOUNTER,PATIENT"
+    StringBuilder s = new StringBuilder();
+    s.append(symptom.symptomCode.code).append(',');
+    s.append(clean(symptom.symptomName)).append(',');
+    s.append(encounterID).append(',');
+    s.append(personID);
+
+    s.append(NEWLINE);
+    write(s.toString(), symptoms);
   }
 
   /**
