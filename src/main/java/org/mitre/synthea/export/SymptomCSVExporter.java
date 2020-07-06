@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.mitre.synthea.engine.ExpressedConditionRecord.ConditionWithSymptoms;
+import org.mitre.synthea.engine.State;
 import org.mitre.synthea.helpers.Config;
 import org.mitre.synthea.helpers.Utilities;
 import org.mitre.synthea.world.agents.Person;
@@ -170,7 +171,7 @@ public class SymptomCSVExporter {
       Integer ageYear = person.ageInYears(time); 
       for (ConditionWithSymptoms conditionWithSymptoms: infos.get(time)) {
         String condition = conditionWithSymptoms.getConditionName();
-        Map<String, List<Integer>> symptomInfo = conditionWithSymptoms.getSymptoms();
+        Map<String, List<State.SymptomNLICE>> symptomInfo = conditionWithSymptoms.getSymptoms();
         Long ageEnd = conditionWithSymptoms.getEndTime(); 
         String ageEndStr = "";
         if (ageEnd != null) {
@@ -185,10 +186,10 @@ public class SymptomCSVExporter {
         
         StringBuilder symptomStr = new StringBuilder();
         for (String symptom: symptomInfo.keySet()) {
-          List<Integer> values = symptomInfo.get(symptom);
+          List<State.SymptomNLICE> values = symptomInfo.get(symptom);
           StringBuilder value = new StringBuilder();
           for (int idx = 0; idx < values.size(); idx++) {
-            value.append(String.valueOf(values.get(idx)));
+            value.append(values.get(idx).toString());
             if (idx < values.size() - 1) {
               value.append(':');
             }

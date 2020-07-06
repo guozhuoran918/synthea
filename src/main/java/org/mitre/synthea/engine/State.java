@@ -7,13 +7,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.apache.commons.math.ode.DerivativeException;
 import org.mitre.synthea.engine.Components.Attachment;
@@ -1748,6 +1746,73 @@ public abstract class State implements Cloneable, Serializable {
     }
   }
 
+  public static class SymptomNLICE {
+    private final String nature;
+    private final String intensity;
+    private final String location;
+    private final String frequency;
+    private final String excitation;
+    private final Integer onset;
+    private final Integer duration;
+    private int value;
+    public SymptomNLICE (String nature, String intensity, String location, String frequency, String excitation, Integer onset, Integer duration) {
+      this.nature = nature;
+      this.intensity = intensity;
+      this.location = location;
+      this.frequency = frequency;
+      this.excitation = excitation;
+      this.onset = onset;
+      this.duration = duration;
+    }
+
+    public void setValue(int value) {
+      this.value = value;
+    }
+
+    public int getValue() {
+      return value;
+    }
+
+    public Integer getOnset() {
+      return onset;
+    }
+
+    public Integer getDuration() {
+      return duration;
+    }
+
+    public String getNature() {
+      return nature;
+    }
+
+    public String getIntensity() {
+      return intensity;
+    }
+
+    public String getFrequency() {
+      return frequency;
+    }
+
+    public String getExcitation() {
+      return excitation;
+    }
+
+    public String getLocation() {
+      return location;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(nature) + ":" +
+              String.valueOf(location) + ":" +
+              String.valueOf(intensity) + ":" +
+              String.valueOf(duration) + ":" +
+              String.valueOf(onset) + ":" +
+              String.valueOf(excitation) + ":" +
+              String.valueOf(value);
+    }
+  }
+
   /**
    * The Symptom state type adds or updates a patient's symptom. Synthea tracks symptoms in order to
    * drive a patient's encounters, on a scale of 1-100. A symptom may be tracked for multiple
@@ -1760,6 +1825,13 @@ public abstract class State implements Cloneable, Serializable {
     private Double probability;
     private Range<Integer> range;
     private Exact<Integer> exact;
+    private Map<String, Double> nature;
+    private Map<String, Double> intensity;
+    private Map<String, Double> location;
+    private Map<String, Double> frequency;
+    private Map<String, Double> duration;
+    private Map<String, Double> onset;
+    private Map<String, Double> excitation;
     public boolean addressed;
 
     @Override
@@ -1783,22 +1855,116 @@ public abstract class State implements Cloneable, Serializable {
       clone.range = range;
       clone.exact = exact;
       clone.addressed = addressed;
+      clone.nature = nature;
+      clone.intensity = intensity;
+      clone.location = location;
+      clone.frequency = frequency;
+      clone.duration = duration;
+      clone.onset = onset;
+      clone.excitation = excitation;
       return clone;
+    }
+
+    private static Map<String, Double> sortByValue(Map<String, Double> unsortMap, final boolean order)
+    {
+      List<Map.Entry<String, Double>> list = new LinkedList<>(unsortMap.entrySet());
+
+      // Sorting the list based on values
+      list.sort((o1, o2) -> order ? o1.getValue().compareTo(o2.getValue()) == 0
+              ? o1.getKey().compareTo(o2.getKey())
+              : o1.getValue().compareTo(o2.getValue()) : o2.getValue().compareTo(o1.getValue()) == 0
+              ? o2.getKey().compareTo(o1.getKey())
+              : o2.getValue().compareTo(o1.getValue()));
+      return list.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, LinkedHashMap::new));
+    }
+
+    private String weightedRandomSelection(Person person, Map<String, Double> features) {
+      if (features == null) {
+        return null;
+      }
+
+      Map<String, Double> sorted = sortByValue(features, true);
+
+      Double[] values = (Double[]) sorted.values().toArray();
+      Double sumValue = 0.0;
+      for (Double d: values) {
+        sumValue += d;
+      }
+
+      Double randValue = person.rand(0, sumValue);
+      String selected = null;
+      Double runningSum = 0.0;
+      for (String key: sorted.keySet()) {
+        Double value = sorted.get(key);
+        runningSum += value;
+        if (runningSum.compareTo(randValue) >= 0) {
+          selected = key;
+          break;
+        }
+      }
+
+      return selected;
+    }
+
+    private Integer getIntRangeFromString(Person person, String selector) {
+      if (selector == null) {
+        return null;
+      }
+
+      String[] parts = selector.split("-");
+      if (parts.length != 2) {
+        return null;
+      }
+      if (parts[0].equals("l")) {
+        double low = Double.parseDouble(parts[1]);
+        double randValue = person.rand(0, low);
+        return (int) randValue;
+      } else if (parts[0].equals("h")) {
+        double high = Double.parseDouble(parts[1]);
+        double randValue = person.rand(high, high*3);
+        return (int) randValue;
+      } else {
+        double low = Double.parseDouble(parts[0]);
+        double high = Double.parseDouble(parts[1]);
+        double randValue = person.rand(low, high);
+        return (int) randValue;
+      }
+    }
+
+    private SymptomNLICE generateNLICE(Person person) {
+      String nature = weightedRandomSelection(person, this.nature);
+      String intensity = weightedRandomSelection(person, this.intensity);
+      String location = weightedRandomSelection(person, this.location);
+      String excitation = weightedRandomSelection(person, this.excitation);
+      String frequency = weightedRandomSelection(person, this.frequency);
+
+      String onsetSelector = weightedRandomSelection(person, this.onset);
+      String durationSelector = weightedRandomSelection(person, this.duration);
+      Integer onset = getIntRangeFromString(person, onsetSelector);
+      Integer duration = getIntRangeFromString(person, durationSelector);
+
+      return new SymptomNLICE(nature, intensity, location, frequency, excitation, onset, duration);
     }
 
     @Override
     public boolean process(Person person, long time) {
       //using the module name instead of the cause
       if (person.rand() <= probability) {
+        SymptomNLICE nlice = generateNLICE(person);
+
         if (exact != null) {
-          person.setSymptom(this.module.name, cause, symptom, time, exact.quantity, addressed);
+          nlice.setValue(exact.quantity);
+          person.setSymptom(this.module.name, cause, symptom, time, exact.quantity, addressed, nlice);
         } else if (range != null) {
+          int value = (int) person.rand(range.low, range.high);
+          nlice.setValue(value);
           person.setSymptom(
-              this.module.name, cause, symptom, time, (int) person.rand(range.low, range.high),
-              addressed
+              this.module.name, cause, symptom, time, value,
+              addressed, nlice
           );
         } else {
-          person.setSymptom(this.module.name, cause, symptom, time, 0, addressed);
+          nlice.setValue(0);
+          person.setSymptom(this.module.name, cause, symptom, time, 0, addressed, nlice);
         }
       }
       return true;

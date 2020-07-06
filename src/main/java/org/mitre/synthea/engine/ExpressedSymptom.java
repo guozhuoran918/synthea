@@ -18,18 +18,21 @@ public class ExpressedSymptom implements Cloneable, Serializable {
     private Integer value;
     // At which time the symptom was set
     private Long time;
+
+    private State.SymptomNLICE nlice;
     
     /**
      * Create a new instance for the supplied cause, value and time.
      */
-    public SymptomInfo(String cause, Integer value, Long time) {
+    public SymptomInfo(String cause, Integer value, Long time, State.SymptomNLICE nlice) {
       this.cause = cause;
       this.value = value;
       this.time = time;
+      this.nlice = nlice;
     }
     
     public SymptomInfo clone() {
-      return new SymptomInfo(this.cause, this.value, this.time);
+      return new SymptomInfo(this.cause, this.value, this.time, this.nlice);
     }
     
     public String getCause() {
@@ -42,7 +45,9 @@ public class ExpressedSymptom implements Cloneable, Serializable {
 
     public Long getTime() {
       return time;
-    }    
+    }
+
+    public State.SymptomNLICE getNlice() {return nlice;}
   }
 
   // this class encapsulates module-based infos regarding an expressed symptoms.
@@ -103,8 +108,8 @@ public class ExpressedSymptom implements Cloneable, Serializable {
     /**
      * Record a new symptom.
      */
-    public void addInfo(String cause, long time, int value, Boolean addressed) {
-      SymptomInfo info = new SymptomInfo(cause, value, time);
+    public void addInfo(String cause, long time, int value, Boolean addressed, State.SymptomNLICE nlice) {
+      SymptomInfo info = new SymptomInfo(cause, value, time, nlice);
       timeInfos.put(Long.valueOf(time), info);
       lastUpdateTime = time;
       resolved = addressed;
@@ -152,11 +157,11 @@ public class ExpressedSymptom implements Cloneable, Serializable {
   
   /** this method updates the data structure wit a symptom being onset from a module.
    */
-  public void onSet(String module, String cause, long time, int value, Boolean addressed) {    
+  public void onSet(String module, String cause, long time, int value, Boolean addressed, State.SymptomNLICE nlice) {
     if (!sources.containsKey(module)) {
       sources.put(module, new SymptomSource(module));
     }
-    sources.get(module).addInfo(cause, time, value, addressed);
+    sources.get(module).addInfo(cause, time, value, addressed, nlice);
   }
   
   /**

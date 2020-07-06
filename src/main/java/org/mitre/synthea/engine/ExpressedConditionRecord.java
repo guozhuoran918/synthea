@@ -222,7 +222,7 @@ public class ExpressedConditionRecord implements Cloneable, Serializable {
     private Long onsetTime;
     private Long endTime;
     // Data structure for storing symptoms and associated values during the condition
-    private Map<String, List<Integer>> symptoms;
+    private Map<String, List<State.SymptomNLICE>> symptoms;
     
     /**
      * Create a new instance for the supplied condition name, onset and end times.
@@ -231,7 +231,7 @@ public class ExpressedConditionRecord implements Cloneable, Serializable {
       this.conditionName = name;
       this.onsetTime = onsetTime;
       this.endTime = endTime;
-      this.symptoms = new ConcurrentHashMap<String, List<Integer>>();
+      this.symptoms = new ConcurrentHashMap<String, List<State.SymptomNLICE>>();
     }
     
     /**
@@ -263,10 +263,10 @@ public class ExpressedConditionRecord implements Cloneable, Serializable {
       if (allTimes.size() > 0) {
         Collections.sort(allTimes);
         if (!symptoms.containsKey(name)) {
-          symptoms.put(name, new ArrayList<Integer>());
+          symptoms.put(name, new ArrayList<State.SymptomNLICE>());
         }
         for (Long time : allTimes) {
-          Integer value = timedTypedSymptoms.get(time).getValue();
+          State.SymptomNLICE value = timedTypedSymptoms.get(time).getNlice();
           symptoms.get(name).add(value);
         }
       }
@@ -284,7 +284,7 @@ public class ExpressedConditionRecord implements Cloneable, Serializable {
       return conditionName;
     }
 
-    public Map<String, List<Integer>> getSymptoms() {
+    public Map<String, List<State.SymptomNLICE>> getSymptoms() {
       return symptoms;
     }
   }

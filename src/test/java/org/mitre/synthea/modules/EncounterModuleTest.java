@@ -56,8 +56,8 @@ public class EncounterModuleTest {
   public void testEmergencySymptomEncounterHasClinician() {
     person.setSymptom(
         "Test", "Test", "Test", System.currentTimeMillis(), 
-        EncounterModule.EMERGENCY_SYMPTOM_THRESHOLD + 1, false
-    );
+        EncounterModule.EMERGENCY_SYMPTOM_THRESHOLD + 1, false,
+            nlice);
     module.process(person, System.currentTimeMillis());
     assertNotNull(person.record);
     assertFalse(person.record.encounters.isEmpty());
@@ -71,8 +71,8 @@ public class EncounterModuleTest {
   public void testUrgentcareSymptomEncounterHasClinician() {
     person.setSymptom(
         "Test", "Test", "Test", System.currentTimeMillis(), 
-        EncounterModule.URGENT_CARE_SYMPTOM_THRESHOLD + 1, false
-    );
+        EncounterModule.URGENT_CARE_SYMPTOM_THRESHOLD + 1, false,
+            nlice);
     module.process(person, System.currentTimeMillis());
     assertNotNull(person.record);
     assertFalse(person.record.encounters.isEmpty());
@@ -86,8 +86,8 @@ public class EncounterModuleTest {
   public void testPrimarySymptomEncounterHasClinician() {
     person.setSymptom(
         "Test", "Test", "Test", System.currentTimeMillis(), 
-        EncounterModule.PCP_SYMPTOM_THRESHOLD + 1, false
-    );
+        EncounterModule.PCP_SYMPTOM_THRESHOLD + 1, false,
+            nlice);
     module.process(person, System.currentTimeMillis());
     assertNotNull(person.record);
     assertFalse(person.record.encounters.isEmpty());
@@ -101,16 +101,16 @@ public class EncounterModuleTest {
   public void testDontStartNewEncounterIfExisting() {
     person.setSymptom(
         "Test", "Test", "Test", System.currentTimeMillis(), 
-        EncounterModule.EMERGENCY_SYMPTOM_THRESHOLD + 1, false
-    );
+        EncounterModule.EMERGENCY_SYMPTOM_THRESHOLD + 1, false,
+            nlice);
     module.process(person, System.currentTimeMillis());
     assertNotNull(person.record);
     assertFalse(person.record.encounters.isEmpty());
     int numberOfEncounters = person.record.encounters.size();
     person.setSymptom(
         "Test", "Test", "Test", System.currentTimeMillis(), 
-        EncounterModule.EMERGENCY_SYMPTOM_THRESHOLD + 1, false
-    );
+        EncounterModule.EMERGENCY_SYMPTOM_THRESHOLD + 1, false,
+            nlice);
     module.process(person, System.currentTimeMillis());
     assertEquals(numberOfEncounters, person.record.encounters.size());
   }

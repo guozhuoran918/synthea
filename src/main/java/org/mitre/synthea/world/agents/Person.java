@@ -349,13 +349,13 @@ public class Person implements Serializable, QuadTreeElement {
   /** Updating the method for accounting of the time on which
    * the symptom is set. 
    */
-  public void setSymptom(String module, String cause, String type, 
-      long time, int value, Boolean addressed) {
+  public void setSymptom(String module, String cause, String type,
+                         long time, int value, Boolean addressed, State.SymptomNLICE nlice) {
     if (!symptoms.containsKey(type)) {
       symptoms.put(type, new ExpressedSymptom(type));
     }
     ExpressedSymptom expressedSymptom = symptoms.get(type);
-    expressedSymptom.onSet(module, cause, time, value, addressed);
+    expressedSymptom.onSet(module, cause, time, value, addressed, nlice);
   }
   
   /**
