@@ -1803,12 +1803,12 @@ public abstract class State implements Cloneable, Serializable {
 
     @Override
     public String toString() {
-      return String.valueOf(nature) + ":" +
-              String.valueOf(location) + ":" +
-              String.valueOf(intensity) + ":" +
-              String.valueOf(duration) + ":" +
-              String.valueOf(onset) + ":" +
-              String.valueOf(excitation) + ":" +
+      return String.valueOf(nature == null ? "": nature) + ":" +
+              String.valueOf(location == null ? "": location) + ":" +
+              String.valueOf(intensity == null ? "": intensity) + ":" +
+              String.valueOf(duration == null ? "": duration) + ":" +
+              String.valueOf(onset == null ? "": onset) + ":" +
+              String.valueOf(excitation == null ? "": excitation) + ":" +
               String.valueOf(value);
     }
   }
@@ -1885,19 +1885,18 @@ public abstract class State implements Cloneable, Serializable {
 
       Map<String, Double> sorted = sortByValue(features, true);
 
-      Double[] values = (Double[]) sorted.values().toArray();
       Double sumValue = 0.0;
-      for (Double d: values) {
-        sumValue += d;
+      for (Double value: sorted.values()) {
+        sumValue += value;
       }
 
-      Double randValue = person.rand(0, sumValue);
+      double randValue = person.rand(0, sumValue);
       String selected = null;
-      Double runningSum = 0.0;
+      double runningSum = 0.0;
       for (String key: sorted.keySet()) {
         Double value = sorted.get(key);
         runningSum += value;
-        if (runningSum.compareTo(randValue) >= 0) {
+        if (runningSum >= randValue) {
           selected = key;
           break;
         }
