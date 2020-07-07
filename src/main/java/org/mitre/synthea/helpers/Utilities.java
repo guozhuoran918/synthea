@@ -311,6 +311,16 @@ public class Utilities {
     return Resources.toString(url, Charsets.UTF_8);
   }
 
+  public static String readFile(Path file) throws IOException {
+    byte[] encoded = Files.readAllBytes(file);
+    return new String(encoded, Charsets.UTF_8);
+  }
+
+  public static String readFile(String filename) throws IOException {
+    return readFile(Paths.get(filename));
+  }
+
+
   /**
    * Get a Gson object, preconfigured to load the GMF modules into classes.
    *

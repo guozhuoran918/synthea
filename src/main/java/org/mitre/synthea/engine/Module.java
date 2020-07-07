@@ -122,6 +122,26 @@ public class Module implements Serializable {
     return submoduleCount.get();
   }
 
+  private static int walkLocalModuleTree(
+          Path modulesPath, Map<String,
+          ModuleSupplier> retVal,
+          Properties overrides
+  ) throws Exception {
+    AtomicInteger submoduleCount = new AtomicInteger();
+    Path basePath = modulesPath.getParent();
+    Utilities.walkAllModules(modulesPath, t -> {
+      String relativePath = relativePath(t, modulesPath);
+      boolean submodule = !t.getParent().equals(modulesPath);
+      if (submodule) {
+        submoduleCount.getAndIncrement();
+      }
+      retVal.put(relativePath, new ModuleSupplier(submodule,
+              relativePath,
+              () -> loadLocalFile(t, submodule, overrides)));
+    });
+    return submoduleCount.get();
+  }
+
   /**
    * Recursively adds a folder or directory of module files to the static list
    * of modules. This does not need to be executed by the core software. It only
@@ -134,7 +154,7 @@ public class Module implements Serializable {
     int originalModuleCount = modules.size();
     Properties moduleOverrides = getModuleOverrides();
     try {
-      walkModuleTree(dir.toPath(), modules, moduleOverrides);
+      walkLocalModuleTree(dir.toPath(), modules, moduleOverrides);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -177,6 +197,16 @@ public class Module implements Serializable {
           throws Exception {
     System.out.format("Loading %s %s\n", submodule ? "submodule" : "module", path.toString());
     String jsonString = Utilities.readResource(path.toString());
+    if (overrides != null) {
+      jsonString = applyOverrides(jsonString, overrides, path.getFileName().toString());
+    }
+    JsonParser parser = new JsonParser();
+    JsonObject object = parser.parse(jsonString).getAsJsonObject();
+    return new Module(object, submodule);
+  }
+
+  private static Module loadLocalFile(Path path, boolean submodule, Properties overrides) throws Exception {
+    String jsonString = Utilities.readFile(path);
     if (overrides != null) {
       jsonString = applyOverrides(jsonString, overrides, path.getFileName().toString());
     }
