@@ -1809,6 +1809,7 @@ public abstract class State implements Cloneable, Serializable {
               String.valueOf(duration == null ? "": duration) + ":" +
               String.valueOf(onset == null ? "": onset) + ":" +
               String.valueOf(excitation == null ? "": excitation) + ":" +
+              String.valueOf(frequency == null ? "": frequency) + ":" +
               String.valueOf(value);
     }
   }
