@@ -1,0 +1,235 @@
+{
+    "name": "update_age_time_to_the_end",
+    "states": {
+        "Initial": {
+            "type": "Initial",
+            "direct_transition": "History_Age_Attribute"
+        },
+        "History_Age_Attribute": {
+            "type": "SetAttribute",
+            "attribute": "age_time_to_the_end",
+            "expression": "#{target_age} - #{age} - 1",
+            "conditional_transition": [
+                {
+                    "condition": {
+                        "condition_type": "Attribute",
+                        "attribute": "age_time_to_the_end",
+                        "operator": "<=",
+                        "value": 1
+                    },
+                    "transition": "End_Time_LessOrEqual_1"
+                },
+                {
+                    "condition": {
+                        "condition_type": "And",
+                        "conditions": [
+                            {
+                                "condition_type": "Attribute",
+                                "attribute": "age_time_to_the_end",
+                                "operator": ">",
+                                "value": 1
+                            },
+                            {
+                                "condition_type": "Attribute",
+                                "attribute": "age_time_to_the_end",
+                                "operator": "<=",
+                                "value": 5
+                            }
+                        ]
+                    },
+                    "transition": "End_Time_1_5"
+                },
+                {
+                    "condition": {
+                        "condition_type": "And",
+                        "conditions": [
+                            {
+                                "condition_type": "Attribute",
+                                "attribute": "age_time_to_the_end",
+                                "operator": ">",
+                                "value": 5
+                            },
+                            {
+                                "condition_type": "Attribute",
+                                "attribute": "age_time_to_the_end",
+                                "operator": "<=",
+                                "value": 15
+                            }
+                        ]
+                    },
+                    "transition": "End_Time_5_15"
+                },
+                {
+                    "condition": {
+                        "condition_type": "And",
+                        "conditions": [
+                            {
+                                "condition_type": "Attribute",
+                                "attribute": "age_time_to_the_end",
+                                "operator": ">",
+                                "value": 15
+                            },
+                            {
+                                "condition_type": "Attribute",
+                                "attribute": "age_time_to_the_end",
+                                "operator": "<=",
+                                "value": 30
+                            }
+                        ]
+                    },
+                    "transition": "End_Time_15_30"
+                },
+                {
+                    "condition": {
+                        "condition_type": "And",
+                        "conditions": [
+                            {
+                                "condition_type": "Attribute",
+                                "attribute": "age_time_to_the_end",
+                                "operator": ">",
+                                "value": 30
+                            },
+                            {
+                                "condition_type": "Attribute",
+                                "attribute": "age_time_to_the_end",
+                                "operator": "<=",
+                                "value": 45
+                            }
+                        ]
+                    },
+                    "transition": "End_Time_30_45"
+                },
+                {
+                    "condition": {
+                        "condition_type": "And",
+                        "conditions": [
+                            {
+                                "condition_type": "Attribute",
+                                "attribute": "age_time_to_the_end",
+                                "operator": ">",
+                                "value": 45
+                            },
+                            {
+                                "condition_type": "Attribute",
+                                "attribute": "age_time_to_the_end",
+                                "operator": "<=",
+                                "value": 60
+                            }
+                        ]
+                    },
+                    "transition": "End_Time_45_60"
+                },
+                {
+                    "condition": {
+                        "condition_type": "And",
+                        "conditions": [
+                            {
+                                "condition_type": "Attribute",
+                                "attribute": "age_time_to_the_end",
+                                "operator": ">",
+                                "value": 60
+                            },
+                            {
+                                "condition_type": "Attribute",
+                                "attribute": "age_time_to_the_end",
+                                "operator": "<=",
+                                "value": 75
+                            }
+                        ]
+                    },
+                    "transition": "End_Time_60_75"
+                },
+                {
+                    "condition": {
+                        "condition_type": "Attribute",
+                        "attribute": "age_time_to_the_end",
+                        "operator": ">",
+                        "value": 75
+                    },
+                    "transition": "End_Time_Greater_75"
+                }
+            ]
+        },
+        "End_Time_LessOrEqual_1": {
+            "type": "Delay",
+            "exact": {
+                "quantity": 1,
+                "unit": "months"
+            },
+            "direct_transition": "Check_Exit"
+        },
+        "End_Time_1_5": {
+            "type": "Delay",
+            "exact": {
+                "quantity": 1,
+                "unit": "years"
+            },
+            "direct_transition": "Check_Exit"
+        },
+        "End_Time_5_15": {
+            "type": "Delay",
+            "exact": {
+                "quantity": 5,
+                "unit": "years"
+            },
+            "direct_transition": "Check_Exit"
+        },
+        "End_Time_15_30": {
+            "type": "Delay",
+            "exact": {
+                "quantity": 15,
+                "unit": "years"
+            },
+            "direct_transition": "Check_Exit"
+        },
+        "End_Time_30_45": {
+            "type": "Delay",
+            "exact": {
+                "quantity": 30,
+                "unit": "years"
+            },
+            "direct_transition": "Check_Exit"
+        },
+        "End_Time_45_60": {
+            "type": "Delay",
+            "exact": {
+                "quantity": 45,
+                "unit": "years"
+            },
+            "direct_transition": "Check_Exit"
+        },
+        "End_Time_60_75": {
+            "type": "Delay",
+            "exact": {
+                "quantity": 60,
+                "unit": "years"
+            },
+            "direct_transition": "Check_Exit"
+        },
+        "End_Time_Greater_75": {
+            "type": "Delay",
+            "exact": {
+                "quantity": 75,
+                "unit": "years"
+            },
+            "direct_transition": "Check_Exit"
+        },
+        "Check_Exit": {
+            "type": "Simple",
+            "conditional_transition": [
+                {
+                    "condition": {
+                        "condition_type": "False"
+                    },
+                    "transition": "TerminalState"
+                },
+                {
+                    "transition": "History_Age_Attribute"
+                }
+            ]
+        },
+        "TerminalState": {
+            "type": "Terminal"
+        }
+    }
+}

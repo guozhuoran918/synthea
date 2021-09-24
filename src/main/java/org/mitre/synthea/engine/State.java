@@ -1752,10 +1752,10 @@ public abstract class State implements Cloneable, Serializable {
     private final String location;
     private final String frequency;
     private final String excitation;
-    private final Integer onset;
-    private final Integer duration;
+    private final String onset;
+    private final String duration;
     private int value;
-    public SymptomNLICE (String nature, String intensity, String location, String frequency, String excitation, Integer onset, Integer duration) {
+    public SymptomNLICE (String nature, String intensity, String location, String frequency, String excitation, String onset, String duration) {
       this.nature = nature;
       this.intensity = intensity;
       this.location = location;
@@ -1773,11 +1773,11 @@ public abstract class State implements Cloneable, Serializable {
       return value;
     }
 
-    public Integer getOnset() {
+    public String getOnset() {
       return onset;
     }
 
-    public Integer getDuration() {
+    public String getDuration() {
       return duration;
     }
 
@@ -1937,11 +1937,12 @@ public abstract class State implements Cloneable, Serializable {
       String location = weightedRandomSelection(person, this.location);
       String excitation = weightedRandomSelection(person, this.excitation);
       String frequency = weightedRandomSelection(person, this.frequency);
-
-      String onsetSelector = weightedRandomSelection(person, this.onset);
-      String durationSelector = weightedRandomSelection(person, this.duration);
-      Integer onset = getIntRangeFromString(person, onsetSelector);
-      Integer duration = getIntRangeFromString(person, durationSelector);
+//      String onsetSelector = weightedRandomSelection(person, this.onset);
+//      String durationSelector = weightedRandomSelection(person, this.duration);
+//      Integer onset = getIntRangeFromString(person, onsetSelector);
+//     Integer duration = getIntRangeFromString(person, durationSelector);
+      String onset = weightedRandomSelection(person, this.onset);
+      String duration = weightedRandomSelection(person, this.duration);
 
       return new SymptomNLICE(nature, intensity, location, frequency, excitation, onset, duration);
     }
